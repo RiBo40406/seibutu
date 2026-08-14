@@ -14,13 +14,13 @@ main{max-width:700px;margin:auto;padding:12px}
 .card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #00000012}
 .progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .progressbar{height:7px;background:#e5e7eb;border-radius:99px;overflow:hidden}
-.progressbar span{display:block;height:100%;background:#2563eb;transition:.2s}
+.progressbar span{display:block;height:100%;background:var(--accent,#2563eb);transition:.2s}
 .badge{display:inline-block;background:#e8f1ff;color:#1859a9;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700;margin-right:5px}
 .question{font-size:17px;line-height:1.65;margin:10px 0 14px;font-weight:700}
 .option{display:block;border:1px solid #d8e0e6;border-radius:11px;padding:12px;margin:8px 0;cursor:pointer;line-height:1.5}
 .option input{margin-right:8px;transform:scale(1.15)}
 .option.selected{border-color:#2563eb;background:#eef5ff}
-button{width:100%;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;background:#2563eb;color:#fff;margin:7px 0}
+button{width:100%;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;background:var(--accent,#2563eb);color:#fff;margin:7px 0}
 button.secondary{background:#64748b}
 .resultbox{border-radius:12px;padding:13px;margin-top:12px;line-height:1.7}
 .ok{background:#ecfdf3;border:1px solid #a7f3d0;color:#075e3c}
@@ -40,6 +40,18 @@ button.secondary{background:#64748b}
 .small{font-size:12px;color:#64748b;line-height:1.6}
 .wrong-item{border-top:1px solid #e5e7eb;padding:12px 0}
 .score{font-size:30px;text-align:center;font-weight:800;margin:5px}
+
+.version-badge{
+  display:inline-block;
+  margin:0 0 10px;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.03em;
+  color:#fff;
+  background:var(--accent,#2563eb);
+}
 </style>
 </head>
 <body>
@@ -57,9 +69,9 @@ button.secondary{background:#64748b}
 </div>
 <section class="card" id="quizCard">
   <div id="quiz"></div>
-  <button id="answerBtn" onclick="answer()">回答する</button>
+  <button id="answerBtn" type="button">回答する</button>
   <div id="feedback"></div>
-  <button id="nextBtn" onclick="nextQuestion()" style="display:none">次の問題へ</button>
+  <button id="nextBtn" type="button" style="display:none">次の問題へ</button>
 </section>
 <section class="card" id="final" style="display:none"></section>
 </main>
@@ -126,7 +138,7 @@ function renderQuestion(){
  document.getElementById("cat").textContent=lessonFor(x.cat);
  document.getElementById("bar").style.width=((pos+1)/current.length*100)+"%";
  const visual=x.img&&images[x.img]?`<figure class="visual"><img src="${images[x.img]}" alt="${x.img}"><figcaption>${x.img}（授業プリントの参考画像）</figcaption></figure>`:"";
- document.getElementById("quiz").innerHTML=`<div class="small"><span class="badge">${x.cat}</span></div><div class="question">${x.q}</div>${visual}${x.o.map((o,j)=>`<label class="option"><input type="radio" name="answer" value="${j}" onchange="selectOption(this)">${LABELS[j]} ${o}</label>`).join("")}`;
+ document.getElementById("quiz").innerHTML=`<div class="small"><span class="badge">${x.cat}</span></div><div class="question">${x.q}</div>${visual}${x.o.map((o,j)=>`<label class="option"><input type="radio" name="answer" value="${j}">${LABELS[j]} ${o}</label>`).join("")}`;
  document.getElementById("feedback").innerHTML="";
  document.getElementById("answerBtn").style.display="block";
  document.getElementById("nextBtn").style.display="none";
@@ -158,5 +170,14 @@ function showFinal(){
  r.scrollIntoView({behavior:"smooth",block:"start"});
 }
 makeTest();
-</script></body>
+</script><script>
+(() => {
+  const VERSION = "UPDATE 2026.08.14 — BLUE";
+  const COLOR = "#2563eb";
+  document.documentElement.style.setProperty("--accent", COLOR);
+  const badge = document.getElementById("versionBadge");
+  if (badge) badge.textContent = VERSION;
+})();
+</script>
+</body>
 </html>

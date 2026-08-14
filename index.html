@@ -142,6 +142,14 @@ function renderQuestion(){
  document.getElementById("feedback").innerHTML="";
  document.getElementById("answerBtn").style.display="block";
  document.getElementById("nextBtn").style.display="none";
+
+ // 選択肢をタップしたときの見た目を更新
+ document.querySelectorAll('input[name="answer"]').forEach(input => {
+   input.addEventListener("change", function(){
+     document.querySelectorAll(".option").forEach(e => e.classList.remove("selected"));
+     this.closest(".option").classList.add("selected");
+   });
+ });
 }
 function selectOption(el){
  document.querySelectorAll(".option").forEach(e=>e.classList.remove("selected"));
@@ -170,6 +178,10 @@ function showFinal(){
  r.scrollIntoView({behavior:"smooth",block:"start"});
 }
 makeTest();
+
+// ボタンと処理を接続
+document.getElementById("answerBtn").addEventListener("click", answer);
+document.getElementById("nextBtn").addEventListener("click", nextQuestion);
 </script><script>
 (() => {
   const VERSION = "UPDATE 2026.08.14 — BLUE";

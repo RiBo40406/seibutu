@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生物学 類題トレーニング</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;background:#f5f6f8;color:#202124}
+  .app{max-width:720px;margin:auto;min-height:100vh;background:white}
+  header{padding:22px 20px 16px;background:#fff;position:sticky;top:0;z-index:5;border-bottom:1px solid #e6e7eb}
+  h1{font-size:20px;margin:0 0 5px}
+  .sub{font-size:13px;color:#6b7280}
+  .progress{height:8px;background:#e9ebef;border-radius:99px;margin-top:14px;overflow:hidden}
+  .bar{height:100%;background:#2563eb;width:0;transition:.25s}
+  main{padding:20px}
+  .meta{display:flex;justify-content:space-between;color:#6b7280;font-size:13px;margin-bottom:12px}
+  .question{font-size:18px;line-height:1.65;font-weight:700;margin:0 0 18px}
+  .choices{display:grid;gap:11px}
+  button.choice{width:100%;text-align:left;padding:15px 14px;border:1px solid #d9dce3;border-radius:12px;background:#fff;font-size:15px;line-height:1.5;cursor:pointer}
+  button.choice:hover{background:#f8fafc}
+  button.choice:disabled{cursor:default}
+  .choice.correct{border-color:#16a34a;background:#ecfdf3}
+  .choice.wrong{border-color:#dc2626;background:#fef2f2}
+  .feedback{display:none;margin-top:16px;padding:14px;border-radius:12px;line-height:1.6;font-size:14px}
+  .feedback.show{display:block}
+  .feedback.good{background:#ecfdf3;color:#166534}
+  .feedback.bad{background:#fef2f2;color:#991b1b}
+  .next{width:100%;margin-top:14px;padding:15px;border:0;border-radius:12px;background:#111827;color:white;font-size:15px;font-weight:700;cursor:pointer}
+  .next:disabled{opacity:.45;cursor:default}
+  .start,.result{text-align:center;padding:40px 20px}
+  .start h2,.result h2{font-size:24px;margin:0 0 12px}
+  .start p,.result p{color:#6b7280;line-height:1.7}
+  .primary{border:0;border-radius:12px;background:#2563eb;color:white;padding:15px 24px;font-size:16px;font-weight:700;cursor:pointer}
+  .secondary{border:1px solid #d9dce3;border-radius:12px;background:white;padding:13px 20px;font-size:15px;cursor:pointer;margin-top:10px}
+  .score{font-size:44px;font-weight:800;margin:18px 0 5px}
+  .review{margin-top:25px;text-align:left}
+  .review-item{padding:13px 0;border-bottom:1px solid #eee;font-size:14px;line-height:1.55}
+  .pill{display:inline-block;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;margin-right:6px}
+  .ok{background:#dcfce7;color:#166534}.ng{background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body>
+<div class="app">
+<header id="header">
+  <h1>🧬 生物学 類題トレーニング</h1>
+  <div class="sub">画像のプリントと同じ「誤っているものを1つ」形式</div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+</header>
+
+<div id="screen"></div>
+</div>
+
+<script>
+const questions = [
+{q:"次の記述のうち、誤っているものを1つ選びなさい。", topic:"生活環・生活史",
+ c:["昆虫の中には、幼虫と成虫で食物や生活場所が大きく異なるものがいる。","カブトムシは卵から幼虫、蛹、成虫という段階を経て発生する。","バッタは蛹の時期を経て成虫になる完全変態の昆虫である。","植物の中には、成長段階によって形態や生活場所が変化するものがある。"],a:2,e:"バッタは不完全変態で、蛹の時期をもちません。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"生活環",
+ c:["チョウの幼虫と成虫では、食べるものが異なる場合がある。","完全変態をする昆虫では、幼虫と成虫の間に蛹の段階がある。","不完全変態をする昆虫では、幼虫は成虫と大きく異なる姿の蛹になる。","生物の生活史には、成長や繁殖などの特徴が含まれる。"],a:2,e:"不完全変態では蛹の段階を経ません。幼虫は脱皮を繰り返して成虫になります。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"海産無脊椎動物",
+ c:["サンゴの幼生には、海中を浮遊する時期がある。","フジツボは一生を通して自由に泳ぎ続ける動物である。","カニの仲間には、幼生期にプランクトンとして生活するものがある。","海産無脊椎動物には、生活史の途中で浮遊生活をするものがいる。"],a:1,e:"フジツボは成長すると固着生活をする甲殻類です。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"魚類の生活史",
+ c:["魚類の中には、仔魚期にプランクトンとして生活するものがある。","ウナギは成長段階によって生活する場所が変化する。","サケの仲間には、海と河川を行き来する生活史をもつものがいる。","すべての魚類は、孵化直後から成魚と同じ環境で生活する。"],a:3,e:"魚類には、成長段階によって生活場所が変わるものが多くあります。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"個体群",
+ c:["個体群の大きさは、出生・死亡・移入・移出によって変化する。","環境収容力は、その環境が長期的に維持できる個体数に関係する。","個体数が増加すると、個体間の競争が強くなる場合がある。","個体群密度は、個体数が増えても必ず一定である。"],a:3,e:"個体群密度は個体数や生息面積によって変化します。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"個体数調査",
+ c:["区画法は、植物など動きの少ない生物の調査に利用できる。","標識再捕法は、移動する動物の個体数推定に利用される。","ポイントセンサスは、一定地点から観察した個体を記録する方法である。","標識再捕法では、一度捕獲した個体を必ずそのまま調査対象から除外する。"],a:3,e:"標識再捕法では、標識を付けて放した個体を再び捕獲し、個体数を推定します。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"個体群変動",
+ c:["季節によって個体数が変動する生物がいる。","個体数の変化には、環境条件が影響することがある。","個体数は、捕食や競争などの生物間関係によって変化することがある。","環境条件が変化しても、個体群の個体数は必ず変化しない。"],a:3,e:"環境条件は出生率・死亡率などを通して個体群の大きさに影響します。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"生物間相互作用",
+ c:["捕食者と被食者の個体数には、相互に影響し合う関係がみられることがある。","競争は、同じ資源を利用する生物の間で生じることがある。","共生には、双方に利益がある関係だけでなく、一方だけが利益を得る関係も含まれる。","異なる種の間では、必ず互いに利益を与え合っている。"],a:3,e:"異なる種の関係には、競争・捕食・寄生など、一方または双方に不利益となるものもあります。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"共生",
+ c:["イソギンチャクとクマノミには、互いに利益を得る関係が知られている。","植物の花粉を運ぶ動物と植物の間には、相互に利益をもつ関係が成立する場合がある。","腸内細菌と動物の間には、共生関係が成立している場合がある。","共生関係にある2種は、必ず同じ場所で一生を過ごす。"],a:3,e:"共生は生活場所や期間を限定する概念ではありません。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"共進化",
+ c:["花の形態と、それを利用する動物の形態が互いに影響を受けながら変化することがある。","特定の植物と、それを利用する昆虫との間に共進化がみられる場合がある。","共進化では、2種以上の生物が互いに選択圧を与えることがある。","共進化とは、ある生物だけが一方的に進化し、相手の種には変化が生じない現象である。"],a:3,e:"共進化は、相互作用する複数の生物が互いに影響を受けて進化する現象です。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"生物の防御",
+ c:["植物のトゲは、草食動物から身を守る働きをもつ場合がある。","昆虫の中には、周囲の環境に似た色や形をもつものがいる。","毒をもつ生物に似た姿をすることで、捕食されにくくなる生物がいる。","動物の体色は、すべて捕食者に見つかりやすくするために進化したものである。"],a:3,e:"体色には、隠蔽・警告・擬態など、捕食を避ける働きをもつものがあります。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"擬態",
+ c:["周囲の環境に似た色彩をもつことで、発見されにくくなることがある。","毒をもつ生物に似た外見を示すことで、捕食を避ける生物がいる。","擬態には、捕食者から身を守ることに関係するものがある。","擬態は、必ず捕食者を発見しやすくするために進化した形質である。"],a:3,e:"擬態には、捕食者から見つかりにくくするものや、危険な生物に似せるものがあります。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"生物毒",
+ c:["一部の魚類には、毒をもつものがいる。","海洋生物の中には、刺すことで毒を注入するものがいる。","生物がもつ毒には、捕食者から身を守る働きをもつものがある。","毒をもつ生物は、すべて食用にすると必ず安全である。"],a:3,e:"毒をもつ生物には食用に適さないものもあり、「必ず安全」は誤りです。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"生物群集",
+ c:["生物群集には、さまざまな種の個体群が含まれる。","森林では、高木層・低木層などの階層構造がみられる。","生物群集では、種間の相互作用がみられる。","生物群集を構成する種は、互いに独立して存在し、相互作用を行わない。"],a:3,e:"生物群集では、捕食・競争・共生など多様な種間関係がみられます。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"遷移",
+ c:["裸地では、時間の経過とともに生物群集が変化することがある。","遷移が進むと、植物の種類や環境条件が変化する。","森林では、光環境などの違いに応じて植物が異なる層に分布することがある。","生態系の遷移では、生物群集は時間が経っても一切変化しない。"],a:3,e:"遷移とは、時間の経過に伴って生物群集が変化していく現象です。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"陸上バイオーム",
+ c:["陸上のバイオームは、気温や降水量などの気候条件と関係している。","熱帯多雨林では、年間を通して比較的高温で降水量が多い。","砂漠では、降水量が少ないことが大きな特徴である。","世界のバイオームは、気温や降水量とは無関係に決まっている。"],a:3,e:"陸上バイオームの分布は、特に気温と降水量に強く関係します。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"日本のバイオーム",
+ c:["日本では、緯度や標高によって植生が変化する。","北海道では、冷温帯にみられる植生が広く分布する。","南西諸島では、暖かい気候に適応した植生がみられる。","日本列島では、標高が高くなるほど必ず熱帯雨林が広がる。"],a:3,e:"一般に標高が高くなるほど気温は低下し、植生帯も変化します。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"海洋バイオーム",
+ c:["海洋は、一般に浅海域・外洋域・深海域などに分けて考えることができる。","浅海域には、サンゴ礁など多様な生物が生息する場所がある。","深海では、光が十分に届くため植物プランクトンによる光合成が盛んに行われる。","海洋では、水深や光環境によって生物相が異なる。"],a:2,e:"深海には十分な光が届かないため、光合成は基本的に行われません。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"海洋生態系",
+ c:["サンゴ礁は、多様な生物が生息する重要な海洋生態系である。","干潟には、陸域と海域の両方の影響を受ける生物群集が形成される。","マングローブ林は、熱帯・亜熱帯の沿岸域に形成されることがある。","サンゴ礁は、深海の光が届かない場所に形成される。"],a:3,e:"サンゴ礁は主に浅く、光が届く暖かい海域に形成されます。"},
+{q:"次の記述のうち、誤っているものを1つ選びなさい。",topic:"深海生態系",
+ c:["深海には、光合成に直接依存しない生態系が存在する。","熱水噴出孔周辺では、化学合成を行う微生物が生態系の基盤となることがある。","深海には、浅海とは異なる環境に適応した生物が生息している。","深海の生物はすべて、植物プランクトンによる光合成だけをエネルギー源としている。"],a:3,e:"熱水噴出孔周辺などでは、化学合成を利用する生態系が成立します。"}
+];
+
+let order=[], idx=0, score=0, answered=false, results=[];
+
+const screen=document.getElementById("screen"), bar=document.getElementById("bar");
+
+function start(){
+  order=[...Array(questions.length).keys()].sort(()=>Math.random()-0.5);
+  idx=0;score=0;results=[];showQuestion();
+}
+function updateBar(){
+  bar.style.width=(idx/questions.length*100)+"%";
+}
+function showStart(){
+  bar.style.width="0%";
+  screen.innerHTML=`<div class="start">
+    <h2>生物、サクサク解こう。</h2>
+    <p>全20問。<br>元プリントと同じ「誤っているものを1つ」形式です。<br>選択肢をタップすると即採点します。</p>
+    <button class="primary" onclick="start()">スタート</button>
+  </div>`;
+}
+function showQuestion(){
+  answered=false; updateBar();
+  const q=questions[order[idx]];
+  screen.innerHTML=`<main>
+    <div class="meta"><span>${idx+1} / ${questions.length}</span><span>${q.topic}</span></div>
+    <p class="question">${q.q}</p>
+    <div class="choices">${q.c.map((x,i)=>`<button class="choice" onclick="answer(${i})">${String.fromCharCode(65+i)}．${x}</button>`).join("")}</div>
+    <div id="feedback" class="feedback"></div>
+    <button id="next" class="next" disabled onclick="next()">次の問題</button>
+  </main>`;
+}
+function answer(i){
+  if(answered)return;
+  answered=true;
+  const q=questions[order[idx]], buttons=document.querySelectorAll(".choice");
+  buttons.forEach((b,n)=>{b.disabled=true;if(n===q.a)b.classList.add("correct");if(n===i&&i!==q.a)b.classList.add("wrong")});
+  const ok=i===q.a;if(ok)score++;
+  results.push({idx:order[idx],ok,chosen:i});
+  const f=document.getElementById("feedback");
+  f.className="feedback show "+(ok?"good":"bad");
+  f.innerHTML=(ok?"⭕ 正解！":"❌ 不正解。")+"<br>"+q.e;
+  document.getElementById("next").disabled=false;
+}
+function next(){
+  idx++;
+  if(idx>=questions.length)showResult(); else showQuestion();
+}
+function showResult(){
+  bar.style.width="100%";
+  const rate=Math.round(score/questions.length*100);
+  let comment=rate>=90?"かなり仕上がっています！":rate>=70?"いい感じです。間違えた分野を復習しましょう。":rate>=50?"基礎をもう一周すると伸びます。":"まずは間違えた問題の解説を重点的に確認しましょう。";
+  screen.innerHTML=`<div class="result">
+    <h2>結果</h2><div class="score">${score} / ${questions.length}</div>
+    <p>${rate}%<br>${comment}</p>
+    <button class="primary" onclick="start()">もう一度ランダム演習</button>
+    <button class="secondary" onclick="review()">間違えた問題を見る</button>
+    <div id="review" class="review"></div>
+  </div>`;
+}
+function review(){
+  const r=document.getElementById("review");
+  const wrong=results.filter(x=>!x.ok);
+  if(!wrong.length){r.innerHTML="<p>全問正解です！🎉</p>";return}
+  r.innerHTML="<h3>復習</h3>"+wrong.map(x=>{
+    const q=questions[x.idx];
+    return `<div class="review-item"><span class="pill ng">不正解</span><b>${q.topic}</b><br>正解：${String.fromCharCode(65+q.a)}．${q.c[q.a]}<br>${q.e}</div>`
+  }).join("");
+}
+showStart();
+</script>
+</body>
+</html>
